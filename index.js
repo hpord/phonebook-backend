@@ -45,15 +45,6 @@ app.delete('/api/persons/:id', (request, response) => {
   
     response.status(204).end()
 })
-
-const generateId = () => {
-    let id
-    do {
-        id = Math.floor(Math.random() * 100);
-    } while (persons.some(p => p.id === id))
-
-    return id
-}
   
 app.post('/api/persons', (request, response) => {
     const name = request.body.name ? request.body.name.trim() : undefined
@@ -65,21 +56,20 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    if (persons.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+    /*if (persons.some(p => p.name.toLowerCase() === name.toLowerCase())) {
         return response.status(400).json({ 
             error: 'name must be unique' 
         })
-    }
+    }*/
   
-    const person = {
+    const person = new Person({
         name,
         number,
-        id: generateId(),
-    }
+    })
   
-    persons = persons.concat(person)
-  
-    response.json(person)
+    person.save().then(savedPerson => {
+        response.json(savedPerson)
+    })
 })
 
 const PORT = process.env.PORT
